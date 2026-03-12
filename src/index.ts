@@ -15,7 +15,7 @@ client.once(Events.ClientReady, () => {
     console.log(`Bot id: ${client.user.id}`)
 })
 
-client.on(Events.MessageCreate, (message) => {
+client.on(Events.MessageCreate, (message: any) => {
     if (message.author.bot) return
 
     if(message.content === '!ping') {
@@ -27,11 +27,11 @@ client.on(Events.MessageCreate, (message) => {
     }
 })
 
-client.on(Events.GuildCreate, (guild) => {
+client.on(Events.GuildCreate, (guild: any) => {
     console.log(`Joined new guild: ${guild.name} (ID: ${guild.id})`)
 })
 
-client.on(Events.MessageCreate, (message) => {
+client.on(Events.MessageCreate, (message: any) => {
     if (message.author.bot) return
 
     if(message.content.startsWith('!schedule')) {
