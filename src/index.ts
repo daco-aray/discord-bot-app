@@ -17,19 +17,10 @@ client.once(Events.ClientReady, () => {
 })
 
 client.on(Events.MessageCreate, (message: Message) => {
-    if (message.author.bot) return
 
-    switch(message.content) {
-        case '!ping':
-            message.reply('Pong!')
-            break
-        case '!hello':
-            message.reply(`Hello, ${message.author.username}!`)
-            break
-        default:
-            // Handle other messages or ignore
-            break
-    }
+    if (isBot(message)) return
+
+    handleMessage(message)
 
 })
 
@@ -37,13 +28,32 @@ client.on(Events.GuildCreate, (guild: any) => {
     console.log(`Joined new guild: ${guild.name} (ID: ${guild.id})`)
 })
 
-client.on(Events.MessageCreate, (message: Message) => {
+client.login(process.env.DISCORD_BOT_TOKEN)
+
+
+const handleMessage = (message: Message) => {
     if (message.author.bot) return
 
-    if(message.content.startsWith('!schedule')) {
-        handleSchedule(message)
+    const args = message.content.trim().split(/\s+/)
+
+    const command = args[0]
+
+    switch(command) {
+        case '!ping':
+            message.reply('Pong!')
+            break
+        case '!hello':
+            message.reply(`Hello, ${message.author.username}!`)
+            break
+        case '!schedule':
+            handleSchedule(message)
+            break
+        default:
+            // Handle other messages or ignore
+            break
     }
+}
 
-})
-
-client.login(process.env.DISCORD_BOT_TOKEN)
+const isBot = (message: Message) => {
+    return message.author.bot
+}
