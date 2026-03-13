@@ -1,4 +1,5 @@
 const cron = require('node-cron')
+const { EmbedBuilder } = require('discord.js')
 
 const handleSchedule = (message: any) => {
 
@@ -21,7 +22,7 @@ const handleSchedule = (message: any) => {
 
     const targetChannel = mentionedChannel || message.channel
 
-    const scheduledText = args.slice(2).join(' ')
+    const scheduledText = args[2]
 
     const [hour, minute] = time.split(':')
 
@@ -33,7 +34,13 @@ const handleSchedule = (message: any) => {
         if (mentionedUser) finalMessage += `@${mentionedUser.username} `
         finalMessage += scheduledText
 
-        targetChannel.send(finalMessage)
+        const embed = new EmbedBuilder()
+            .setTitle('Scheduled Message')
+            .setDescription(finalMessage)
+            .setColor(0xFEE75C)
+            .setTimestamp()
+
+        targetChannel.send({ embeds: [embed] })
     })
 
     message.reply(`Scheduled message "${scheduledText}" at ${time} every day!`)
