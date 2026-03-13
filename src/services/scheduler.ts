@@ -1,7 +1,8 @@
 const cron = require('node-cron')
 const { EmbedBuilder } = require('discord.js')
+import Message from '../types/message'
 
-const handleSchedule = (message: any) => {
+const handleSchedule = (message: Message) => {
 
     const args = message.content.trim().split(/\s+/)
 
