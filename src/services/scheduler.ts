@@ -1,6 +1,6 @@
 const cron = require('node-cron')
 
-const handleSchedule = (message) => {
+const handleSchedule = (message: any) => {
 
     const args = message.content.trim().split(/\s+/)
 
@@ -9,9 +9,15 @@ const handleSchedule = (message) => {
 
     const time = args[1]
 
-    const mentionedUser = message.mentions.users.first()
-    const mentionedChannel = message.mentions.channels.first()
-    const mentionedEveryone = message.mentions.everyone
+    if(!isTimeValid(time)) {
+        return message.reply("Invalid time format. Use HH:MM (24-hour format)")
+    }
+
+    const { users, channels, everyone } = message.mentions
+
+    const mentionedUser = users.first()
+    const mentionedChannel = channels.first()
+    const mentionedEveryone = everyone
 
     const targetChannel = mentionedChannel || message.channel
 
@@ -31,6 +37,11 @@ const handleSchedule = (message) => {
     })
 
     message.reply(`Scheduled message "${scheduledText}" at ${time} every day!`)
+}
+
+const isTimeValid: (time: string) => boolean = (time) => {
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+    return timeRegex.test(time)
 }
 
 module.exports = {
