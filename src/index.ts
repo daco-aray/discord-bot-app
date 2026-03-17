@@ -34,7 +34,7 @@ client.login(process.env.DISCORD_BOT_TOKEN)
 const handleMessage = (message: Message) => {
     if (message.author.bot) return
 
-    const [command, ...args] = message.content.trim().split(/\s+/)
+    const command = message.content.trim().split(/\s+/)[0]
 
     switch(command) {
         case '!ping':
