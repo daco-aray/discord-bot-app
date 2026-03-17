@@ -24,20 +24,29 @@ const handleSchedule = async(message: Message) => {
 
     const targetChannel = mentionedChannel || message.channel
 
-    const scheduledText = args[2]
+    const scheduledText = message.content.match(/"([^"]*)"/)?.[1]
+
+    if(!scheduledText) {
+        return message.reply("No message provided. Use !schedule HH:MM \"message\" [@user] [#channel]")
+    }
 
     try {
-
-        console.log('inserting!!!')
         
         const result = await query(`
             INSERT INTO scheduled_messages (guild_id, channel_id, time, message, mentioned_user_id, mentioned_everyone, created_by, created_at, is_active) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), true)
         `, [message.guild?.id, targetChannel.id, time, scheduledText, mentionedUser?.id || null, mentionedEveryone, 'system'])
 
+        let finalMessage = ""
+        if(mentionedEveryone) finalMessage += " @everyone "
+        if(mentionedUser) {
+            finalMessage += ` @${mentionedUser.username} `
+        }
+        finalMessage += scheduledText
+
         const [hour, minute] = time.split(':')
         cron.schedule(`${minute} ${hour} * * *`, () => {
-            targetChannel.send(scheduledText)
+            targetChannel.send(finalMessage)
         })
 
     } catch (error) {
@@ -64,12 +73,11 @@ const sendScheduleMessage = async(id: number, client: any) => {
         if(!channel) return
 
         let finalMessage = ""
-        if(scheduledMessage.mentioned_everyone) finalMessage += "@everyone "
+        if(scheduledMessage.mentioned_everyone) finalMessage += " @everyone "
         if(scheduledMessage.mentioned_user_id) {
             const user = await client.users.fetch(scheduledMessage.mentioned_user_id)
-            finalMessage += `@${user.username} `
+            finalMessage += ` @${user.username} `
         }
-
         finalMessage += scheduledMessage.message
 
         const embed = new EmbedBuilder()
