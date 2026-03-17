@@ -1,6 +1,6 @@
 require('dotenv').config()
 const { Client, GatewayIntentBits, Events } = require('discord.js')
-const { handleSchedule } = require('./services/scheduler')
+const { handleSchedule, loadScheduledMessages } = require('./services/scheduler')
 import Message from './types/message'
 
 const client = new Client({
@@ -14,6 +14,7 @@ const client = new Client({
 client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`)
     console.log(`Bot id: ${client.user.id}`)
+    loadScheduledMessages(client)
 })
 
 client.on(Events.MessageCreate, (message: Message) => {
