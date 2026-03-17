@@ -1,8 +1,9 @@
 const cron = require('node-cron')
 const { EmbedBuilder } = require('discord.js')
+import { query } from '../config/database'
 import Message from '../types/message'
 
-const handleSchedule = (message: Message) => {
+const handleSchedule = async(message: Message) => {
 
     const args = message.content.trim().split(/\s+/)
 
@@ -27,22 +28,17 @@ const handleSchedule = (message: Message) => {
 
     const [hour, minute] = time.split(':')
 
-    cron.schedule(`${minute} ${hour} * * *`, () => {
+    try {
         
-        let finalMessage = ""
+        const result = await query(`
+            INSERT INTO scheduled_messages (guild_id, channel_id, time, message, mentioned_user_id, mentioned_everyone, created_by, created_at, is_active) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), true)
+        `, [message.guild?.id, targetChannel.id, time, scheduledText, mentionedUser?.id || null, mentionedEveryone, 'system'])
 
-        if (mentionedEveryone) finalMessage += "@everyone "
-        if (mentionedUser) finalMessage += `@${mentionedUser.username} `
-        finalMessage += scheduledText
-
-        const embed = new EmbedBuilder()
-            .setTitle('Scheduled Message')
-            .setDescription(finalMessage)
-            .setColor(0xFEE75C)
-            .setTimestamp()
-
-        targetChannel.send({ embeds: [embed] })
-    })
+    } catch (error) {
+        console.error(error)
+        message.reply("Error scheduling message")
+    }
 
     message.reply(`Scheduled message "${scheduledText}" at ${time} every day!`)
 }

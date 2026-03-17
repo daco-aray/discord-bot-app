@@ -11,5 +11,8 @@ export default interface Message {
         everyone: boolean;
         
     };
+    guild: {
+        id: string;
+    };
     reply: (response: string) => void;
 }
