@@ -15,6 +15,7 @@ client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`)
     console.log(`Bot id: ${client.user.id}`)
     initializeClient(client)
+    loadScheduledMessages()
 })
 
 client.on(Events.MessageCreate, (message: Message) => {
